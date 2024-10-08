@@ -5,7 +5,7 @@
 ## Table of Contents
 
 - [Features](#features)
-- [Installation](#introduction)
+- [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Middleware](#middlewares)
   - [1. Error Handling Middleware (`errorHandler`)](#1-error-handling-middleware-errorhandler)
