@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "composite": false,
+    "declaration": true,
+    "strictNullChecks": false,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "inlineSources": false,
+    "isolatedModules": true,
+    "module": "commonjs",
+    "target": "es2022",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "preserveWatchOutput": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "outDir": "./dist",
+    "baseUrl": "./"
+  },
+  "include": ["src/**/*.ts", "types/**/*.d.ts"]
+}
