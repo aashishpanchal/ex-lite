@@ -7,7 +7,7 @@
 - [Features](#features)
 - [Installation](#installation)
 - [Quick Start](#quick-start)
-- [Middleware](#middlewares)
+- [Middlewares](#middlewares)
   - [1. Error Handling Middleware (`errorHandler`)](#1-error-handling-middleware-errorhandler)
   - [2. Not Found Handler (`notFoundHandler`)](#2-not-found-handler-notfoundhandler)
 - [Wrapper: Simplifying Async Controllers](#wrapper-simplifying-async-controllers)
@@ -68,7 +68,7 @@ app.listen(3000, () => {
 });
 ```
 
-## Middleware
+## Middlewares
 
 ### **1. Error Handling Middleware (`errorHandler`)**
 
