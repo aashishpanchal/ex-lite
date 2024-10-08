@@ -4,6 +4,23 @@
 
 ---
 
+## Table of Contents
+
+- [Features](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
+- [Installation](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
+- [Quick Start](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
+- [Middleware](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
+  - [1. Error Handling Middleware (`errorHandler`)](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
+  - [2. Not Found Handler (`notFoundHandler`)](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
+- [Wrapper: Simplifying Async Controllers](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
+- [HttpError](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
+- [Using `HttpStatus` for Consistent Status Codes](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
+- [Standardized JSON Responses with `ApiRes`](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
+- [Validation with `Zod`](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
+- [Controller Factory with `tsyringe`](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
+- [Contributing](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
+- [License](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
+
 ## Features
 
 - **`wrapper`**: Async controller functions by automatically managing errors.
@@ -327,14 +344,14 @@ you need to configure your project as follows:
 
 2.  Configure TypeScript:
     Add the following to your `tsconfig.json`:
-        ```json
-        {
-          "compilerOptions": {
-            "experimentalDecorators": true,
-            "emitDecoratorMetadata": true
-          }
-        }
-        ```
+    `json
+    {
+      "compilerOptions": {
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
+      }
+    }
+    `
 3.  Import `reflect-metadata` in your main file (e.g., `app.ts` or `server.ts`):
 
     ```tsx
