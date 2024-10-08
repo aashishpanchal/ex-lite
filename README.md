@@ -2,24 +2,22 @@
 
 `ex-lite` is a lightweight utility for Express.js that simplifies common server-side tasks. It streamlines error handling, status code management, response formatting, input validation, and more. It also integrates well with tools like Zod and Tsyringe to enhance the development of Express.js applications.
 
----
-
 ## Table of Contents
 
-- [Features](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
-- [Installation](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
-- [Quick Start](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
-- [Middleware](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
-  - [1. Error Handling Middleware (`errorHandler`)](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
-  - [2. Not Found Handler (`notFoundHandler`)](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
-- [Wrapper: Simplifying Async Controllers](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
-- [HttpError](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
-- [Using `HttpStatus` for Consistent Status Codes](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
-- [Standardized JSON Responses with `ApiRes`](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
-- [Validation with `Zod`](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
-- [Controller Factory with `tsyringe`](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
-- [Contributing](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
-- [License](https://www.notion.so/Ex-Lite-1119876e0a45806db58fc5b0ab2ffb21?pvs=21)
+- [Features](#features)
+- [Installation](#introduction)
+- [Quick Start](#quick-start)
+- [Middleware](#middlewares)
+  - [1. Error Handling Middleware (`errorHandler`)](#1-error-handling-middleware-errorhandler)
+  - [2. Not Found Handler (`notFoundHandler`)](#2-not-found-handler-notfoundhandler)
+- [Wrapper: Simplifying Async Controllers](#wrapper-simplifying-async-controllers)
+- [HttpError](#httperror)
+- [Using `HttpStatus` for Consistent Status Codes](#using-httpstatus-for-consistent-status-codes)
+- [Standardized JSON Responses with `ApiRes`](#standardized-json-responses-with-apires)
+- [Validation with `Zod`](#validation-with-zod)
+- [Controller Factory with `tsyringe`](#controller-factory-with-tsyringe)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Features
 
@@ -345,13 +343,13 @@ you need to configure your project as follows:
 2.  Configure TypeScript:
     Add the following to your `tsconfig.json`:
     `json
-    {
-      "compilerOptions": {
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true
-      }
-    }
-    `
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  }
+}
+`
 3.  Import `reflect-metadata` in your main file (e.g., `app.ts` or `server.ts`):
 
     ```tsx
