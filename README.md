@@ -6,14 +6,14 @@
 
 ## Features
 
-- **`wrapper`**: Simplifies async controller functions by automatically managing errors.
-- **`HttpStatus`**: Provides an enumeration of HTTP status codes.
-- **`HttpError`**: Handles custom HTTP errors.
-- **`ApiRes`**: Standardizes JSON API responses with pre-defined methods (e.g., `ok`, `created`).
+- **`wrapper`**: Async controller functions by automatically managing errors.
+- **`HttpError & HttpStaus`**: Handles custom http-errors. & Provides http-status codes.
+- **`ApiRes`**: JSON API responses with pre-defined methods (e.g., `ok`, `created`).
 - **`validate`**: Middleware for validating request `body`, `query`, and `params` using Zod schemas.
 - **`controllerFactory`**: A factory function for creating controller handlers with dependency injection using `tsyringe`.
-- **`errorHandler`**: Centralized error-handling middleware for catching and processing errors across the application.
-- **`notFoundHandler`**: Middleware that returns a standardized 404 response for undefined routes.
+- `middlewares`:
+  - **`errorHandler`**: Centralized error-handling middleware for catching and processing errors across the application.
+  - **`notFoundHandler`**: Middleware that returns a standardized 404 response for undefined routes.
 
 ## Installation
 
@@ -23,31 +23,46 @@ Install `ex-lite`
 npm install --save ex-lite zod
 ```
 
-## Middleware
+## Quick Start
 
-Middleware in `ex-lite` simplifies error handling and route management.
+Here’s a minimal setup to get you started with `ex-lite`:
+
+```tsx
+import express from 'express';
+import {wrapper, errorHandler, notFoundHandler} from 'ex-lite';
+
+const app = express();
+
+// Middleware
+app.use(express.json());
+
+// Example route using wrapper
+const getUser = wrapper(async (req, res) => {
+  const user = await getUserById(req.params.id);
+  return ApiRes.ok(user); // Send user data in the response
+});
+
+app.get('/user/:id', getUser);
+app.use(notFoundHandler);
+
+// Error handling middleware
+app.use(errorHandler);
+
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
+```
+
+## Middleware
 
 ### **1. Error Handling Middleware (`errorHandler`)**
 
 The `errorHandler` middleware ensures that all errors thrown in the application, whether intentional (like `HttpError`) or unexpected, are handled consistently. This prevents unhandled errors from crashing your server.
 
 ```tsx
-import express from 'express';
-import {errorHandler, HttpError, HttpStatus} from 'ex-lite';
+import {errorHandler} from 'ex-lite';
 
-const app = express();
-
-// Throwing a 404 error if no route matches
-app.get('*', () => {
-  throw new HttpError('Resource Not Found', HttpStatus.NOT_FOUND);
-});
-
-// Central error-handling middleware
-app.use(errorHandler);
-
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
-});
+app.use(errorHandler); // Place this after route definitions
 ```
 
 This middleware catches any error in the app and formats a standardized response. It works in tandem with the `HttpError` class to return appropriate status codes and error messages.
@@ -57,41 +72,119 @@ This middleware catches any error in the app and formats a standardized response
 The `notFoundHandler` middleware provides a default response for undefined routes. It ensures that your application returns a clean, standardized 404 response without requiring additional boilerplate code.
 
 ```tsx
-import express from 'express';
-import {notFoundHandler, errorHandler} from 'ex-lite';
+import {notFoundHandler} from 'ex-lite';
 
-const app = express();
+app.use(notFoundHandler); // This should be placed after your routes
+```
 
-// Define your API routes here
-app.use('/api', apiRoutes);
+## Wrapper: Simplifying Async Controllers
 
-// Handle 404 for any undefined route
-app.use(notFoundHandler);
+In an Express.js application, dealing with asynchronous functions often requires `try-catch` blocks to handle errors. This can lead to repetitive, boilerplate code in every route handler. The `wrapper` function in `ex-lite` eliminates this by automatically managing `try-catch` behavior for async functions, ensuring that any thrown errors are caught and handled by your error-handling middleware.
 
-// Centralized error handling
-app.use(errorHandler);
+### Why Use `wrapper`?
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+Without `wrapper`, your route handlers would typically look like this:
+
+```tsx
+app.get('/user/:id', async (req, res, next) => {
+  try {
+    const user = await getUserById(req.params.id);
+    res.status(200).json(user);
+  } catch (error) {
+    next(error); // Pass the error to the error-handling middleware
+  }
 });
 ```
 
-## Wrapper
+This can get cumbersome when you have many routes. The `wrapper` function simplifies this pattern by catching any errors and passing them to `next()` automatically.
 
-The `wrapper` function simplifies async route handling by wrapping controller functions and automatically catching errors. This saves you from having to repeatedly write `try-catch` blocks.
+### How to Use `wrapper`
 
-### Usage
+The `wrapper` function accepts an async function (a route handler) and returns a new function that will handle errors for you. Here’s how to use it:
 
 ```tsx
 import {wrapper, ApiRes} from 'ex-lite';
 
+// Route without wrapper (traditional approach with try-catch)
+app.get('/user/:id', async (req, res, next) => {
+  try {
+    const user = await getUserById(req.params.id);
+    res.status(200).json(user);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Route using wrapper (simplified with ex-lite)
 const getUser = wrapper(async (req, res) => {
-  const user = await getUserById(req.params.id); // Fetch the user by ID
-  return ApiRes.ok(user); // Return success response
+  const user = await getUserById(req.params.id); // Fetch user from database
+  return ApiRes.ok(user); // Send success response using ApiRes
 });
 
 app.get('/user/:id', getUser);
 ```
+
+### Detailed Example
+
+Let’s say you have a basic Express application where you need to get a user by ID, and you also want to handle errors like a user not being found or a database connection issue.
+
+```tsx
+import express from 'express';
+import {wrapper, ApiRes, HttpError, HttpStatus, errorHandler} from 'ex-lite';
+
+// Mock function to simulate getting a user by ID
+const getUserById = async id => {
+  // Simulating a user fetch
+  if (id === '1') return {id: 1, name: 'John Doe'};
+  else throw new HttpError('User Not Found', HttpStatus.NOT_FOUND);
+};
+
+const app = express();
+
+// Without wrapper: you'd need to add try-catch manually
+app.get('/manual-user/:id', async (req, res, next) => {
+  try {
+    const user = await getUserById(req.params.id);
+    res.status(200).json(ApiRes.ok(user));
+  } catch (error) {
+    next(error);
+  }
+});
+
+// With wrapper: no try-catch needed
+const getUser = wrapper(async (req, res) => {
+  const user = await getUserById(req.params.id);
+  return ApiRes.ok(user, 'User fetched successfully');
+});
+
+app.get('/user/:id', getUser);
+
+// Error-handling middleware to catch all errors
+app.use(errorHandler);
+
+// Start server
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
+```
+
+### How `wrapper` Works
+
+1. **Input**: You pass an async function (the route handler) to `wrapper`.
+2. **Behavior**: The `wrapper` function executes your handler inside a `try-catch` block.
+3. **Error Handling**: If your handler throws an error (e.g., from a database query), `wrapper` catches it and passes the error to Express's `next()` function.
+4. **Success**: If no errors occur, the handler returns a response using helper methods like `ApiRes.ok`.
+
+### What Happens Behind the Scenes:
+
+- Instead of writing `try-catch` for every async controller, `wrapper` automatically catches any errors and forwards them to the next middleware (`next(error)`).
+- This helps to **reduce boilerplate code** and keeps your controllers clean and focused on their logic.
+
+### Benefits of Using `wrapper`:
+
+- **Error Management**: Errors are passed to the `errorHandler` middleware automatically.
+- **Less Boilerplate**: No need to manually write `try-catch` blocks in every route.
+- **Consistency**: It ensures that all errors are handled in a centralized manner.
 
 ## HttpError
 
@@ -110,16 +203,8 @@ app.get('*', () => {
 // Example with wrapper
 app.post(
   '/example',
-  wrapper((req, res, next) => {
+  wrapper(req => {
     if (!req.body.name) throw new BadRequestError('Name is required');
-  }),
-);
-
-// Example with an unknown error
-app.get(
-  '/unknown-error',
-  wrapper((req, res, next) => {
-    throw new Error('Hello World');
   }),
 );
 ```
