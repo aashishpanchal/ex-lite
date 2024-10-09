@@ -1,6 +1,6 @@
 {
   "name": "ex-lite",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "engines": {
     "node": ">=16.20.1"
   },
@@ -10,7 +10,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aashishpanchal/ex-lite.git"
+    "url": "git+https://github.com/aashishpanchal/ex-lite.git"
   },
   "homepage": "https://github.com/aashishpanchal/ex-lite#readme",
   "keywords": [
@@ -22,8 +22,7 @@
     "http-errors"
   ],
   "files": [
-    "dist/**/*.js",
-    "src/**/*.ts"
+    "dist/**/*.js"
   ],
   "author": "Aashish Panchal <aipanchal51@gmail.com>",
   "scripts": {
