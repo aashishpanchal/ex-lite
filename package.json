@@ -10,9 +10,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aashishpanchal/exlite.git"
+    "url": "https://github.com/aashishpanchal/ex-lite.git"
   },
-  "homepage": "https://github.com/aashishpanchal/exlite#readme",
+  "homepage": "https://github.com/aashishpanchal/ex-lite#readme",
   "keywords": [
     "express",
     "ex-lite",
