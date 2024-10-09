@@ -10,7 +10,7 @@
 - [Middlewares](#middlewares)
   - [1. Error Handling Middleware (`errorHandler`)](#1-error-handling-middleware-errorhandler)
   - [2. Not Found Handler (`notFoundHandler`)](#2-not-found-handler-notfoundhandler)
-- [Wrapper: Simplifying Async Controllers](#wrapper-simplifying-async-controllers)
+- [Wrapper: Simplifying Controllers](#wrapper-simplifying-async-controllers)
 - [HttpError](#httperror)
 - [Using `HttpStatus` for Consistent Status Codes](#using-httpstatus-for-consistent-status-codes)
 - [Standardized JSON Responses with `ApiRes`](#standardized-json-responses-with-apires)
@@ -21,9 +21,9 @@
 
 ## Features
 
-- **`wrapper`**: Async controller functions by automatically managing errors.
+- **`wrapper`**: controller functions by automatically managing errors.
 - **`HttpError & HttpStaus`**: Handles custom http-errors. & Provides http-status codes.
-- **`ApiRes`**: JSON API responses with pre-defined methods (e.g., `ok`, `created`, `paginated`).
+- **`ApiRes`**: JSON API responses object with pre-defined methods (e.g., `ok`, `created` `paginated`).
 - **`validate`**: Middleware for validating request `body`, `query`, and `params` using Zod schemas.
 - **`controllerFactory`**: A factory function for creating controller handlers with dependency injection using `tsyringe`.
 - `middlewares`:
@@ -68,7 +68,7 @@ app.listen(3000, () => {
 });
 ```
 
-## Middlewares
+## Middleware
 
 ### **1. Error Handling Middleware (`errorHandler`)**
 
@@ -92,15 +92,16 @@ import {notFoundHandler} from 'ex-lite';
 app.use(notFoundHandler); // This should be placed after your routes
 ```
 
-## Wrapper: Simplifying Async Controllers
+## Wrapper: Simplifying Controllers
 
-In an Express.js application, dealing with asynchronous functions often requires `try-catch` blocks to handle errors. This can lead to repetitive, boilerplate code in every route handler. The `wrapper` function in `ex-lite` eliminates this by automatically managing `try-catch` behavior for async functions, ensuring that any thrown errors are caught and handled by your error-handling middleware.
+In an Express.js application, dealing with asynchronous functions often requires `try-catch` blocks to handle errors. This can lead to repetitive, boilerplate code in every route handler. The `wrapper` function in `ex-lite` eliminates this by automatically managing `try-catch` behavior for async/sync functions, ensuring that any thrown errors are caught and handled by your error-handling middleware.
 
 ### Why Use `wrapper`?
 
 Without `wrapper`, your route handlers would typically look like this:
 
 ```tsx
+// Route without wrapper (traditional approach with try-catch)
 app.get('/user/:id', async (req, res, next) => {
   try {
     const user = await getUserById(req.params.id);
@@ -115,87 +116,130 @@ This can get cumbersome when you have many routes. The `wrapper` function simpli
 
 ### How to Use `wrapper`
 
-The `wrapper` function accepts an async function (a route handler) and returns a new function that will handle errors for you. Here’s how to use it:
+The `wrapper` function accepts an async/sync function (a route handler) and returns a new function that will handle errors for you. Here’s how to use it:
 
 ```tsx
 import {wrapper, ApiRes} from 'ex-lite';
 
-// Route without wrapper (traditional approach with try-catch)
-app.get('/user/:id', async (req, res, next) => {
-  try {
-    const user = await getUserById(req.params.id);
-    res.status(200).json(user);
-  } catch (error) {
-    next(error);
-  }
-});
-
 // Route using wrapper (simplified with ex-lite)
-const getUser = wrapper(async (req, res) => {
-  const user = await getUserById(req.params.id); // Fetch user from database
-  return ApiRes.ok(user); // Send success response using ApiRes
-});
-
-app.get('/user/:id', getUser);
+app.get(
+  '/user/:id',
+  wrapper(async (req, res) => {
+    const user = await getUserById(req.params.id); // Fetch user from database
+    return ApiRes.ok(user, 'User fetched successfully'); // Send success response using ApiRes
+  }),
+);
 ```
 
-### Detailed Example
-
-Let’s say you have a basic Express application where you need to get a user by ID, and you also want to handle errors like a user not being found or a database connection issue.
+**Example of manipulating cookies and header, etc with `ApiRes`**
 
 ```tsx
-import express from 'express';
-import {wrapper, ApiRes, HttpError, HttpStatus, errorHandler} from 'ex-lite';
+const login = wrapper(async (req, res) => {
+  const {email, password} = req.body;
+  const user = await loginUser(email, password);
 
-// Mock function to simulate getting a user by ID
-const getUserById = async id => {
-  // Simulating a user fetch
-  if (id === '1') return {id: 1, name: 'John Doe'};
-  else throw new HttpError('User Not Found', HttpStatus.NOT_FOUND);
-};
+  // Manually setting headers
+  res.setHeader('X-Custom-Header', 'SomeHeaderValue');
 
-const app = express();
+  // Set multiple cookies for authentication
+  res.cookie('access-token', user.accessToken, {
+    httpOnly: true,
+    secure: true, // Set to true in production with HTTPS
+    maxAge: 3600000, // 1 hour
+  });
 
-// Without wrapper: you'd need to add try-catch manually
-app.get('/manual-user/:id', async (req, res, next) => {
-  try {
-    const user = await getUserById(req.params.id);
-    res.status(200).json(ApiRes.ok(user));
-  } catch (error) {
-    next(error);
-  }
-});
+  res.cookie('refresh-token', user.refreshToken, {
+    httpOnly: true,
+    secure: true,
+    maxAge: 7 * 24 * 3600000, // 1 week
+  });
 
-// With wrapper: no try-catch needed
-const getUser = wrapper(async (req, res) => {
-  const user = await getUserById(req.params.id);
-  return ApiRes.ok(user, 'User fetched successfully');
-});
-
-app.get('/user/:id', getUser);
-
-// Error-handling middleware to catch all errors
-app.use(errorHandler);
-
-// Start server
-app.listen(3000, () => {
-  console.log('Server running on port 3000');
+  // api-response with token and user info
+  return ApiRes.ok(user, 'Logged in successfully');
 });
 ```
 
-### How `wrapper` Works
+**Example without `ApiRes`**
+
+```tsx
+// 1. example
+const getHome = wrapper(() => {
+  return 'Hello World!';
+});
+
+// 2. example
+const getHome = wrapper(() => {
+  return {
+    message: 'Hello World!',
+  }; // default set status-code 200
+});
+
+// 3. example
+const login = wrapper(async (req, res) => {
+  const user = await getUserById(req.params.id);
+
+  // Manually setting headers
+  res.setHeader('X-Custom-Header', 'SomeHeaderValue');
+
+  // Setting cookies
+  res.cookie('access-token', user.accessToken, {
+    httpOnly: true,
+    secure: true, // Set to true in production with HTTPS
+    maxAge: 3600000, // 1 hour
+  });
+
+  // Sending a custom JSON response
+  res.status(200).json({
+    status: 'success',
+    message: 'User fetched successfully',
+    data: user,
+  });
+});
+```
+
+**Example as `middleware`**
+
+```tsx
+import {Role} from './constants';
+import {wrapper, ForbiddenError} from 'ex-lite';
+
+/** user permission middleware */
+export const permission = (...roles: Role[]) =>
+  wrapper(async (req, _, next) => {
+    const {user} = req;
+
+    if (!roles) return true;
+
+    if (!user) return false;
+
+    const checker = user && roles.includes(user?.role);
+
+    if (!checker)
+      throw new ForbiddenError(
+        `User have not permission to access ${req.originalUrl}`,
+      );
+
+    next();
+  });
+
+// all permission middleware
+export const onlyAdmin = permission(Role.ADMIN);
+export const adminOrUser = permission(Role.ADMIN, Role.USER);
+```
+
+**How `wrapper` Works**
 
 1. **Input**: You pass an async function (the route handler) to `wrapper`.
 2. **Behavior**: The `wrapper` function executes your handler inside a `try-catch` block.
 3. **Error Handling**: If your handler throws an error (e.g., from a database query), `wrapper` catches it and passes the error to Express's `next()` function.
 4. **Success**: If no errors occur, the handler returns a response using helper methods like `ApiRes.ok`.
 
-### What Happens Behind the Scenes:
+**What Happens Behind the Scenes:**
 
 - Instead of writing `try-catch` for every async controller, `wrapper` automatically catches any errors and forwards them to the next middleware (`next(error)`).
 - This helps to **reduce boilerplate code** and keeps your controllers clean and focused on their logic.
 
-### Benefits of Using `wrapper`:
+**Benefits of Using `wrapper`:**
 
 - **Error Management**: Errors are passed to the `errorHandler` middleware automatically.
 - **Less Boilerplate**: No need to manually write `try-catch` blocks in every route.
@@ -265,7 +309,7 @@ app.get('/status-example', (req, res) => {
 
 ## Standardized JSON Responses with `ApiRes`
 
-`ApiRes` provides a consistent structure for API responses. It includes several static methods that handle common response patterns, such as `ok`, `created`, `paginated`.
+`ApiRes` provides a consistent structure for API responses. It includes several static methods that handle common response patterns, such as `ok`, `created` `paginated`.
 
 ### Usage
 
@@ -335,27 +379,27 @@ app.get('/search', validate.query(querySchema), (req, res) => {
 
 you need to configure your project as follows:
 
-1.  Install `tsyringe`:
+1. Install `tsyringe`:
 
-    ```bash
-    npm install tsyringe reflect-metadata
-    ```
+   ```bash
+   npm install tsyringe reflect-metadata
+   ```
 
-2.  Configure TypeScript:
-    Add the following to your `tsconfig.json`:
-    ```json
-    {
-      "compilerOptions": {
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true
-      }
-    }
-    ```
-3.  Import `reflect-metadata` in your main file (e.g., `app.ts` or `server.ts`):
+2. Configure TypeScript:
+   Add the following to your `tsconfig.json`:
+   ```json
+   {
+     "compilerOptions": {
+       "experimentalDecorators": true,
+       "emitDecoratorMetadata": true
+     }
+   }
+   ```
+3. Import `reflect-metadata` in your main file (e.g., `app.ts` or `server.ts`):
 
-    ```tsx
-    import 'reflect-metadata';
-    ```
+   ```tsx
+   import 'reflect-metadata';
+   ```
 
 After these steps, you can use the `controllerFactory` feature as described in the usage section.
 
@@ -380,14 +424,15 @@ export class AuthService {
 
 // auth.controller.ts
 import {singleton} from 'tsyringe';
-import {AuthService} from './services';
+import {AuthService} from './auth.service.ts';
+import type {Request, Response} from 'express'
 
 @singleton()
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   /** signin request handler */
-  async signin(req, res) {
+  async signin(req: Request, res: Response) {
     const {access, refresh, user} = await this.authService.signin(req.body);
     res.cookie('access-token', access.token, {
       httpOnly: true,
@@ -401,7 +446,7 @@ export class AuthController {
   }
 
   /** signup request handler */
-  async signup(req) {
+  async signup(req: Request, res: Response) {
     const user = await this.authService.signup(req.body);
     return ApiRes.created(user.id, 'User created successfully');
   }
@@ -410,6 +455,7 @@ export class AuthController {
 // auth.routes.ts
 import {Router} from 'express'
 import {controllerFactory} from 'ex-lite';
+import {AuthController} from './auth.controller.ts'
 
 export const authRoutes = (): Router => {
   // Router
@@ -421,6 +467,9 @@ export const authRoutes = (): Router => {
     .post('/signin', getMethod('signin'))
     .post('/signup', getMethod('signup'))
 };
+
+// app.ts
+app.use('/user', authRoutes())
 ```
 
 **_Note:_** _The `controllerFactory` is an optional feature that allows you to use `tsyringe` for dependency injection in your controllers. This is especially useful for larger applications where different services need to be injected into controllers._
