@@ -363,18 +363,18 @@ After these steps, you can use the `controllerFactory` feature as described in t
 
 In this example, `AuthController` uses the `AuthService` for authentication handling. The `controllerFactory` creates controller handlers, making method injection easy.
 
-`````tsx
+```tsx
 // auth.service.ts
 import {singleton} from 'tsyringe';
 
 @singleton()
 export class AuthService {
   async signin(data: object) {
-    ````;
+    ''''
   }
 
   async signup(data: object) {
-    ````;
+    ''''
   }
 }
 
@@ -414,7 +414,7 @@ const authController = controllerFactory(AuthController);
 // auth.router.ts
 router.post('/signin', authController.getMethod('signin'));
 router.post('/signup', authController.getMethod('signup'));
-`````
+```
 
 **_Note:_** _The `controllerFactory` is an optional feature that allows you to use `tsyringe` for dependency injection in your controllers. This is especially useful for larger applications where different services need to be injected into controllers._
 
