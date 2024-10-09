@@ -380,7 +380,6 @@ export class AuthService {
 
 // auth.controller.ts
 import {singleton} from 'tsyringe';
-import {controllerFactory} from 'ex-lite';
 import {AuthService} from './services';
 
 @singleton()
@@ -408,12 +407,20 @@ export class AuthController {
   }
 }
 
-// Create controller handlers with resolve dependency
-const authController = controllerFactory(AuthController);
+// auth.routes.ts
+import {Router} from 'express'
+import {controllerFactory} from 'ex-lite';
 
-// auth.router.ts
-router.post('/signin', authController.getMethod('signin'));
-router.post('/signup', authController.getMethod('signup'));
+export const authRoutes = (): Router => {
+  // Router
+  const router = Router();
+  // Controller
+  const {getMethod} = controllerFactory(AuthController);
+  // Initialize
+  return router
+    .post('/signin', getMethod('signin'))
+    .post('/signup', getMethod('signup'))
+};
 ```
 
 **_Note:_** _The `controllerFactory` is an optional feature that allows you to use `tsyringe` for dependency injection in your controllers. This is especially useful for larger applications where different services need to be injected into controllers._
