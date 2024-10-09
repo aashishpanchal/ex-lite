@@ -1,6 +1,6 @@
 {
   "name": "ex-lite",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "engines": {
     "node": ">=16.20.1"
   },
@@ -22,7 +22,7 @@
     "http-errors"
   ],
   "files": [
-    "dist/**/*.js"
+    "dist/**"
   ],
   "author": "Aashish Panchal <aipanchal51@gmail.com>",
   "scripts": {
