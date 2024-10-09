@@ -23,7 +23,7 @@
 
 - **`wrapper`**: Async controller functions by automatically managing errors.
 - **`HttpError & HttpStaus`**: Handles custom http-errors. & Provides http-status codes.
-- **`ApiRes`**: JSON API responses with pre-defined methods (e.g., `ok`, `created`).
+- **`ApiRes`**: JSON API responses with pre-defined methods (e.g., `ok`, `created`, `paginated`).
 - **`validate`**: Middleware for validating request `body`, `query`, and `params` using Zod schemas.
 - **`controllerFactory`**: A factory function for creating controller handlers with dependency injection using `tsyringe`.
 - `middlewares`:
@@ -265,7 +265,7 @@ app.get('/status-example', (req, res) => {
 
 ## Standardized JSON Responses with `ApiRes`
 
-`ApiRes` provides a consistent structure for API responses. It includes several static methods that handle common response patterns, such as `ok`, `created`.
+`ApiRes` provides a consistent structure for API responses. It includes several static methods that handle common response patterns, such as `ok`, `created`, `paginated`.
 
 ### Usage
 
@@ -285,6 +285,7 @@ app.post(
 
 - **`ok(result, message)`**: Returns a success response (HTTP 200).
 - **`created(result, message)`**: Returns a resource creation response (HTTP 201).
+- **`paginated(data, meta, message)`**: Returns a success response (HTTP 200).
 
 ## Validation with `Zod`
 
@@ -342,14 +343,14 @@ you need to configure your project as follows:
 
 2.  Configure TypeScript:
     Add the following to your `tsconfig.json`:
-    `json
-{
-  "compilerOptions": {
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
-  }
-}
-`
+    ```json
+    {
+      "compilerOptions": {
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
+      }
+    }
+    ```
 3.  Import `reflect-metadata` in your main file (e.g., `app.ts` or `server.ts`):
 
     ```tsx
@@ -362,25 +363,25 @@ After these steps, you can use the `controllerFactory` feature as described in t
 
 In this example, `AuthController` uses the `AuthService` for authentication handling. The `controllerFactory` creates controller handlers, making method injection easy.
 
-```tsx
+`````tsx
 // auth.service.ts
-import {singleton} from "tsyringe";
+import {singleton} from 'tsyringe';
 
 @singleton()
 export class AuthService {
-	async signin(data: object){
-		'''
-	}
+  async signin(data: object) {
+    ````;
+  }
 
-	async signup(data: object){
-		'''
-	}
+  async signup(data: object) {
+    ````;
+  }
 }
 
 // auth.controller.ts
-import {singleton} from "tsyringe";
-import {controllerFactory} from "ex-lite";
-import {AuthService} from "./services";
+import {singleton} from 'tsyringe';
+import {controllerFactory} from 'ex-lite';
+import {AuthService} from './services';
 
 @singleton()
 export class AuthController {
@@ -388,22 +389,22 @@ export class AuthController {
 
   /** signin request handler */
   async signin(req, res) {
-    const { access, refresh, user } = await this.authService.signin(req.body);
-    res.cookie("access-token", access.token, {
+    const {access, refresh, user} = await this.authService.signin(req.body);
+    res.cookie('access-token', access.token, {
       httpOnly: true,
       maxAge: access.maxAge,
     });
-    res.cookie("refresh-token", refresh.token, {
+    res.cookie('refresh-token', refresh.token, {
       httpOnly: true,
       maxAge: refresh.maxAge,
     });
-    return ApiRes.ok(user.id, "User logged in successfully");
+    return ApiRes.ok(user.id, 'User logged in successfully');
   }
 
-	/** signup request handler */
+  /** signup request handler */
   async signup(req) {
     const user = await this.authService.signup(req.body);
-    return ApiRes.created(user.id, "User created successfully");
+    return ApiRes.created(user.id, 'User created successfully');
   }
 }
 
@@ -411,9 +412,9 @@ export class AuthController {
 const authController = controllerFactory(AuthController);
 
 // auth.router.ts
-router.post("/signin", authController.getMethod("signin"));
-router.post("/signup", authController.getMethod("signup"));
-```
+router.post('/signin', authController.getMethod('signin'));
+router.post('/signup', authController.getMethod('signup'));
+`````
 
 **_Note:_** _The `controllerFactory` is an optional feature that allows you to use `tsyringe` for dependency injection in your controllers. This is especially useful for larger applications where different services need to be injected into controllers._
 

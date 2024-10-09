@@ -4,7 +4,7 @@ import type {Constructor, ReqHandler} from './types';
 
 // Handles the result returned by the wrapped function.
 function handleResult(result: unknown, res: Response): void {
-  if (result instanceof ApiRes) res.status(result.status).json(result);
+  if (result instanceof ApiRes) res.status(result.status).json(result.toJson());
   else if (result && result !== res) res.send(result);
 }
 
