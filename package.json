@@ -1,6 +1,6 @@
 {
   "name": "ex-lite",
-  "version": "1.0.6",
+  "version": "1.0.5",
   "engines": {
     "node": ">=16.20.1"
   },
