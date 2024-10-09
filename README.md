@@ -10,7 +10,7 @@
 - [Middlewares](#middlewares)
   - [1. Error Handling Middleware (`errorHandler`)](#1-error-handling-middleware-errorhandler)
   - [2. Not Found Handler (`notFoundHandler`)](#2-not-found-handler-notfoundhandler)
-- [Wrapper: Simplifying Controllers](#wrapper-simplifying-async-controllers)
+- [Wrapper: Simplifying Controllers](#wrapper-simplifying-controllers)
 - [HttpError](#httperror)
 - [Using `HttpStatus` for Consistent Status Codes](#using-httpstatus-for-consistent-status-codes)
 - [Standardized JSON Responses with `ApiRes`](#standardized-json-responses-with-apires)
@@ -68,7 +68,7 @@ app.listen(3000, () => {
 });
 ```
 
-## Middleware
+## Middlewares
 
 ### **1. Error Handling Middleware (`errorHandler`)**
 
