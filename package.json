@@ -1,47 +1,58 @@
 {
   "name": "ex-lite",
-  "version": "1.0.5",
+  "version": "1.2.0",
+  "description": "Express helper library",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib/**/*.js",
+    "lib/**/*.d.ts"
+  ],
   "engines": {
     "node": ">=16.20.1"
   },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": "./dist/index.js",
-  "license": "MIT",
+  "scripts": {
+    "build": "rimraf lib && tsc -p tsconfig.build.json",
+    "lint": "eslint -c ./.eslintrc.js \"./**/*.{js,ts}\"",
+    "lint:fix": "eslint --fix -c ./.eslintrc.js \"./**/*.{js,ts}\"",
+    "format": "prettier --write \"**/*.{ts,js}\""
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aashishpanchal/ex-lite.git"
   },
-  "homepage": "https://github.com/aashishpanchal/ex-lite#readme",
-  "keywords": [
-    "express",
-    "ex-lite",
-    "express-lite",
-    "express-helper",
-    "http-status",
-    "http-errors"
-  ],
-  "files": [
-    "dist/**"
-  ],
   "author": "Aashish Panchal <aipanchal51@gmail.com>",
-  "scripts": {
-    "build": "tsc",
-    "format": "prettier --write \"**/*.{ts,js}\""
-  },
-  "devDependencies": {
-    "@types/express": "^5.0.0",
-    "@types/node": "^22.7.4",
-    "prettier": "^3.3.3",
-    "typescript": "^5.6.2",
-    "zod": "^3.23.8"
-  },
-  "dependencies": {
-    "http-status": "^1.7.4"
-  },
+  "license": "MIT",
   "peerDependencies": {
     "express": "^4.21.0",
     "tsyringe": "^4.8.0",
     "zod": "^3.23.8"
-  }
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.7.5",
+    "@typescript-eslint/eslint-plugin": "^8.8.1",
+    "@typescript-eslint/parser": "^8.8.1",
+    "eslint": "8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-define-config": "^2.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.1",
+    "typescript": "~5.5.4"
+  },
+  "dependencies": {
+    "http-status": "^1.7.4"
+  },
+  "keywords": [
+    "express",
+    "ex-lite",
+    "tsyringe",
+    "zod",
+    "helper",
+    "library",
+    "http-status",
+    "http-errors"
+  ],
+  "homepage": "https://github.com/aashishpanchal/ex-lite#readme"
 }

@@ -18,12 +18,12 @@ export class ApiRes {
   }
 
   /** ok response function. */
-  ok(result: any, message?: string) {
+  static ok(result: any, message?: string) {
     return new ApiRes(result, httpStatus.OK, message);
   }
 
   /** created response function. */
-  created(result: any, message?: string) {
+  static created(result: any, message?: string) {
     return new ApiRes(
       result,
       httpStatus.CREATED,
@@ -32,7 +32,7 @@ export class ApiRes {
   }
 
   /** paginated response function. */
-  paginated(data: any, meta: object, message?: string) {
+  static paginated(data: any, meta: object, message?: string) {
     return new ApiRes({...meta, data}, httpStatus.OK, message);
   }
 }

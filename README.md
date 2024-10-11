@@ -15,7 +15,7 @@
 - [Using `HttpStatus` for Consistent Status Codes](#using-httpstatus-for-consistent-status-codes)
 - [Standardized JSON Responses with `ApiRes`](#standardized-json-responses-with-apires)
 - [Validation with `Zod`](#validation-with-zod)
-- [Controller Factory with `tsyringe`](#controller-factory-with-tsyringe)
+- [Controller Class](#controller-class)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -25,7 +25,7 @@
 - **`HttpError & HttpStaus`**: Handles custom http-errors. & Provides http-status codes.
 - **`ApiRes`**: JSON API responses object with pre-defined methods (e.g., `ok`, `created` `paginated`).
 - **`validate`**: Middleware for validating request `body`, `query`, and `params` using Zod schemas.
-- **`controllerFactory`**: A factory function for creating controller handlers with dependency injection using `tsyringe`.
+- **`createController`**: Creates a wrapped controller method for routes**.** with dependency injection using `tsyringe` and without.
 - `middlewares`:
   - **`errorHandler`**: Centralized error-handling middleware for catching and processing errors across the application.
   - **`notFoundHandler`**: Middleware that returns a standardized 404 response for undefined routes.
@@ -329,7 +329,7 @@ app.post(
 
 - **`ok(result, message)`**: Returns a success response (HTTP 200).
 - **`created(result, message)`**: Returns a resource creation response (HTTP 201).
-- **`paginated(data, meta, message)`**: Returns a success response (HTTP 200).
+- `paginated(data, meta, message)`**:** Returns a success response (HTTP 200).
 
 ## Validation with `Zod`
 
@@ -375,7 +375,70 @@ app.get('/search', validate.query(querySchema), (req, res) => {
 });
 ```
 
-## Controller Factory with `tsyringe`
+## Controller Class
+
+Creating class-based controllers in Express.js can be complex due to the need for managing instance methods, binding **`this`** context, and handling dependencies. Traditional middleware functions typically rely on plain functions, making it challenging to encapsulate logic and state effectively in a class-based structure.
+
+The **`createController`** function simplifies this process by providing an easy way to create class-based controllers and automatically handling method references internally. This allows developers to focus on their application logic rather than the boilerplate code required for class-based controllers.
+
+`createController**(cls,** useTsyringe**)**`
+
+- `cls` A class constructor function representing the controller.
+- `useTsyringe` (optional): A boolean indicating whether to use `tsyringe` for dependency injection. Defaults to `true`.
+
+### Example without `tsyringe`
+
+Use `createController(Controller, false)` to create a controller with a local instance.
+
+```tsx
+// create a controller with a local instance.
+const controller = createController(Controller, false);
+```
+
+### Usage
+
+```tsx
+// auth.controller.ts
+import {ApiRes} from 'ex-lite';
+import {AuthService} from './auth.service'; // Importing service without tsyringe
+import type {Request, Response} from 'express';
+
+export class AuthController {
+  private authService = new AuthService(); // Local instance
+
+  async signin(req: Request, res: Response) {
+    const user = await this.authService.signin(req.body);
+    return ApiRes.ok(user, 'User signed in successfully');
+  }
+
+  async signup(req: Request, res: Response) {
+    const user = await this.authService.signup(req.body);
+    return ApiRes.created(user, 'User signed up successfully');
+  }
+}
+
+// auth.routes.ts
+import {Router} from 'express';
+import {createController} from 'ex-lite';
+import {LocalAuthController} from './localAuth.controller';
+
+export const localAuthRoutes = (): Router => {
+  const router = Router();
+  const auth = createController(LocalAuthController, false); // Without using tsyringe
+  return router
+    .post('/signin', auth.getMethod('signin'))
+    .post('/signup', auth.getMethod('signup'));
+};
+```
+
+### Example with `tsyringe`
+
+Use `createController(AuthController, true)` to create a controller that leverages dependency injection.
+
+```tsx
+// create a controller with leverage the tsyringe dependency injection system.
+const controller = createController(Controller); // Using tsyringe
+```
 
 you need to configure your project as follows:
 
@@ -401,11 +464,9 @@ you need to configure your project as follows:
    import 'reflect-metadata';
    ```
 
-After these steps, you can use the `controllerFactory` feature as described in the usage section.
-
 ### Usage
 
-In this example, `AuthController` uses the `AuthService` for authentication handling. The `controllerFactory` creates controller handlers, making method injection easy.
+In this example, `AuthController` uses the `AuthService` for authentication handling. The `createController` handlers making method injection easy.
 
 ```tsx
 // auth.service.ts
@@ -454,25 +515,25 @@ export class AuthController {
 
 // auth.routes.ts
 import {Router} from 'express'
-import {controllerFactory} from 'ex-lite';
+import {createController} from 'ex-lite';
 import {AuthController} from './auth.controller.ts'
 
 export const authRoutes = (): Router => {
   // Router
   const router = Router();
   // Controller
-  const {getMethod} = controllerFactory(AuthController);
+  const auth = createController(AuthController);
   // Initialize
   return router
-    .post('/signin', getMethod('signin'))
-    .post('/signup', getMethod('signup'))
+    .post('/signin', auth.getMethod('signin'))
+    .post('/signup', auth.getMethod('signup'))
 };
 
 // app.ts
 app.use('/user', authRoutes())
 ```
 
-**_Note:_** _The `controllerFactory` is an optional feature that allows you to use `tsyringe` for dependency injection in your controllers. This is especially useful for larger applications where different services need to be injected into controllers._
+**_Note:_** _The `createController` is an feature that allows you to use `tsyringe` for dependency injection in your controllers. This is especially useful for larger applications where different services need to be injected into controllers._
 
 ## Contributing
 
