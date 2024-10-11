@@ -381,7 +381,7 @@ Creating class-based controllers in Express.js can be complex due to the need fo
 
 The **`createController`** function simplifies this process by providing an easy way to create class-based controllers and automatically handling method references internally. This allows developers to focus on their application logic rather than the boilerplate code required for class-based controllers.
 
-`createController**(cls,** useTsyringe**)**`
+`createController(cls, useTsyringe)`
 
 - `cls` A class constructor function representing the controller.
 - `useTsyringe` (optional): A boolean indicating whether to use `tsyringe` for dependency injection. Defaults to `true`.
