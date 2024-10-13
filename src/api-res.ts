@@ -1,14 +1,25 @@
 import httpStatus from 'http-status';
 
-/** api-response class */
+/**
+ * ApiRes class for standardizing API responses
+ */
 export class ApiRes {
+  /**
+   * Creates an instance of ApiRes.
+   * @param {any} result - The result of the operation
+   * @param {number} status - The HTTP status code
+   * @param {string} message - The response message
+   */
   constructor(
     readonly result: any = {},
     readonly status: number = httpStatus.OK,
-    readonly message: string = 'success',
+    readonly message: string = 'Operation successful',
   ) {}
 
-  /** returns the JSON representation of the response. */
+  /**
+   * Returns the JSON representation of the response.
+   * @returns The JSON representation of the response
+   */
   public toJson() {
     return {
       status: this.status,
@@ -17,22 +28,44 @@ export class ApiRes {
     };
   }
 
-  /** ok response function. */
-  static ok(result: any, message?: string) {
+  /**
+   * Creates an OK (200) response.
+   * @param {any} result - The result to be included in the response
+   * @param {string} [message='Request processed successfully'] - The response message
+   * @returns {ApiRes} An ApiRes instance with OK status
+   */
+  static ok(
+    result: any,
+    message: string = 'Request processed successfully',
+  ): ApiRes {
     return new ApiRes(result, httpStatus.OK, message);
   }
 
-  /** created response function. */
-  static created(result: any, message?: string) {
-    return new ApiRes(
-      result,
-      httpStatus.CREATED,
-      message || 'resource created successfully',
-    );
+  /**
+   * Creates a Created (201) response.
+   * @param {any} result - The result to be included in the response
+   * @param {string} [message='Resource created successfully'] - The response message
+   * @returns {ApiRes} An ApiRes instance with Created status
+   */
+  static created(
+    result: any,
+    message: string = 'Resource created successfully',
+  ): ApiRes {
+    return new ApiRes(result, httpStatus.CREATED, message);
   }
 
-  /** paginated response function. */
-  static paginated(data: any, meta: object, message?: string) {
+  /**
+   * Creates a paginated OK (200) response.
+   * @param {any} data - The paginated data
+   * @param {object} meta - Metadata for pagination
+   * @param {string} [message='Data retrieved successfully'] - The response message
+   * @returns {ApiRes} An ApiRes instance with OK status and paginated data
+   */
+  static paginated(
+    data: any,
+    meta: object,
+    message: string = 'Data retrieved successfully',
+  ): ApiRes {
     return new ApiRes({...meta, data}, httpStatus.OK, message);
   }
 }

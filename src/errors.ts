@@ -7,14 +7,13 @@ import type {BodyMessage, HttpErrorBody, HttpStatusNumber} from './types';
  * @returns {string} - The formatted error name.
  */
 export const getErrorName = (status: number): string => {
-  if (status < 400 || status > 511) return 'Error';
-  const name = httpStatus[`${status as HttpStatusNumber}_NAME`].toLowerCase();
-  return (
-    name
-      .replace(/_/g, ' ')
-      .replace(/\b\w/g, char => char.toUpperCase())
-      .replace(/\s+/g, '') + 'Error'
-  );
+  if (status < 400 || status > 511) return 'HttpError';
+  const name = httpStatus[`${status as HttpStatusNumber}_NAME`]
+    .toLowerCase()
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, char => char.toUpperCase())
+    .replace(/\s+/g, '');
+  return name.endsWith('Error') ? name : name.concat('Error');
 };
 
 /**

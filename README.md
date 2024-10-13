@@ -58,10 +58,10 @@ const getUser = wrapper(async (req, res) => {
 });
 
 app.get('/user/:id', getUser);
-app.use(notFoundHandler);
+app.use(notFoundHandler());
 
 // Error handling middleware
-app.use(errorHandler);
+app.use(errorHandler());
 
 app.listen(3000, () => {
   console.log('Server running on port 3000');
@@ -77,7 +77,7 @@ The `errorHandler` middleware ensures that all errors thrown in the application,
 ```tsx
 import {errorHandler} from 'ex-lite';
 
-app.use(errorHandler); // Place this after route definitions
+app.use(errorHandler()); // Place this after route definitions
 ```
 
 This middleware catches any error in the app and formats a standardized response. It works in tandem with the `HttpError` class to return appropriate status codes and error messages.
@@ -89,7 +89,7 @@ The `notFoundHandler` middleware provides a default response for undefined route
 ```tsx
 import {notFoundHandler} from 'ex-lite';
 
-app.use(notFoundHandler); // This should be placed after your routes
+app.use(notFoundHandler()); // This should be placed after your routes
 ```
 
 ## Wrapper: Simplifying Controllers
