@@ -398,6 +398,17 @@ const controller = createController(Controller, false);
 ### Usage
 
 ```tsx
+// auth.service.ts
+export class AuthService {
+  async signin(data: object) {
+    ''''
+  }
+
+  async signup(data: object) {
+    ''''
+  }
+}
+
 // auth.controller.ts
 import {ApiRes} from 'ex-lite';
 import {AuthService} from './auth.service'; // Importing service without tsyringe
@@ -420,15 +431,21 @@ export class AuthController {
 // auth.routes.ts
 import {Router} from 'express';
 import {createController} from 'ex-lite';
-import {LocalAuthController} from './localAuth.controller';
+import {AuthController} from './auth.controller';
 
-export const localAuthRoutes = (): Router => {
+export const authRoutes = (): Router => {
+  // Router
   const router = Router();
-  const auth = createController(LocalAuthController, false); // Without using tsyringe
+  // Controller
+  const auth = createController(AuthController, false); // Without using tsyringe
+  // Initialize
   return router
     .post('/signin', auth.getMethod('signin'))
-    .post('/signup', auth.getMethod('signup'));
+    .post('/signup', auth.getMethod('signup'))
 };
+
+// app.ts
+app.use('/user', authRoutes())
 ```
 
 ### Example with `tsyringe`
